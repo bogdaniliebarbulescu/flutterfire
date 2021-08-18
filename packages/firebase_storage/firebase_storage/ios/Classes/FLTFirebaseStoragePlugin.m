@@ -603,7 +603,10 @@ typedef NS_ENUM(NSUInteger, FLTFirebaseStorageStringType) {
                         ]];
                         return;
                       }
-                    } @catch (NSException *e) {}
+                    } @catch (NSException *e) {
+                      NSLog(@"%@", e);
+                    }
+                    
                     [weakSelf.channel invokeMethod:@"Task#onFailure" arguments:[
                       weakSelf NSDictionaryFromHandle:handle
                       andFIRStorageTaskSnapshot:snapshot
