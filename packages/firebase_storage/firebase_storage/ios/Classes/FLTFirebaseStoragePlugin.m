@@ -594,15 +594,20 @@ typedef NS_ENUM(NSUInteger, FLTFirebaseStorageStringType) {
                     @synchronized(self->_tasks) {
                       [self->_tasks removeObjectForKey:handle];
                     }
-                    if (snapshot.error.code == FIRStorageErrorCodeCancelled) {
-                      [weakSelf.channel invokeMethod:@"Task#onCanceled"
-                                           arguments:[weakSelf NSDictionaryFromHandle:handle
-                                                            andFIRStorageTaskSnapshot:snapshot]];
-                    } else {
-                      [weakSelf.channel invokeMethod:@"Task#onFailure"
-                                           arguments:[weakSelf NSDictionaryFromHandle:handle
-                                                            andFIRStorageTaskSnapshot:snapshot]];
-                    }
+
+                    @try {
+                      if (snapshot.error.code == FIRStorageErrorCodeCancelled) {
+                        [weakSelf.channel invokeMethod:@"Task#onCanceled" arguments:[
+                          weakSelf NSDictionaryFromHandle:handle
+                          ndFIRStorageTaskSnapshot:snapshot
+                        ]];
+                        return;
+                      }
+                    } @catch (NSException *e) {}
+                    [weakSelf.channel invokeMethod:@"Task#onFailure" arguments:[
+                      weakSelf NSDictionaryFromHandle:handle
+                      andFIRStorageTaskSnapshot:snapshot
+                    ]];
                   });
                 }];
   });
